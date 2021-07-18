@@ -15,8 +15,10 @@ RUN pip install -r requirements.txt
 # copy the content of the local src directory to the working directory
 COPY datadiy.py .
 
-EXPOSE 8501
-ENTRYPOINT ["streamlit","run"]
+EXPOSE 80
+# ENTRYPOINT ["streamlit","run"]
 
 # command to run on container start
-CMD ["./datadiy.py" ]
+#CMD ["./datadiy.py" ]
+
+CMD ["sh", "-c", "streamlit run --browser.serverAddress 0.0.0.0 --server.enableCORS False --server.port 80 ./datadiy.py" ]
