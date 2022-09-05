@@ -10,8 +10,6 @@ from pandas.api.types import is_numeric_dtype
 import missingno as msno
 
 
-st.set_page_config(layout="wide")
-
 uf = st.sidebar.file_uploader('Upload')
 if uf:
     df_raw = pd.read_csv(uf)
@@ -25,10 +23,11 @@ if uf:
     for col in df_raw:
         col_list_raw.append(col)
 
-    # create expander for [a]
-    choose_col_expander = st.sidebar.expander("Columns to " + selection)
-    # create a NEW dataframe based on user selection
-    selected_col = choose_col_expander.multiselect('If none selected, all data fields will be retained',col_list_raw)
+    if selection != 'Keep Original':
+        # create expander for [a]
+        choose_col_expander = st.sidebar.expander("Columns to " + selection)
+        # create a NEW dataframe based on user selection
+        selected_col = choose_col_expander.multiselect('If none selected, all data fields will be retained',col_list_raw)
 
     if selection == 'Keep Original':
         df_modify = df_raw
@@ -100,25 +99,25 @@ def download_link(object_to_download, download_filename, download_link_text):
 
 st.title('DataPrep')
 
+if uf:
+    df = pd.DataFrame()
+    for i in df_modify.columns:
+        dict = {}
+        dict = {'Column':i, 'Dtype': str(df_modify[i].dtype), 'Unique Values': len(df_modify[i].unique()), 'null': sum(df_modify[i].isnull())}
+        df = df.append(dict, ignore_index=True)
+    st.write(df)
 
-df = pd.DataFrame()
-for i in df_modify.columns:
-    dict = {}
-    dict = {'Column':i, 'Dtype': str(df_modify[i].dtype), 'Unique Values': len(df_modify[i].unique()), 'null': sum(df_modify[i].isnull())}
-    df = df.append(dict, ignore_index=True)
-st.write(df)
+    # crreate missingo chart to display data completeness
+    fig = msno.matrix(df_modify)
+    fig_copy = fig.get_figure()
+    fig_copy.savefig('raw.png', bbox_inches = 'tight')
 
-# crreate missingo chart to display data completeness
-fig = msno.matrix(df_modify)
-fig_copy = fig.get_figure()
-fig_copy.savefig('raw.png', bbox_inches = 'tight')
-
- # display missingno chart
-st.image('raw.png')
+    # display missingno chart
+    st.image('raw.png')
 
 
-st.write(df_modify)
+    st.write(df_modify)
 
-tmp_download_link_file_append = download_link(df_modify, 'df_modify.csv', 'Click here to download your data!')
-st.markdown(tmp_download_link_file_append, unsafe_allow_html=True)
+    tmp_download_link_file_append = download_link(df_modify, 'df_modify.csv', 'Click here to download your data!')
+    st.markdown(tmp_download_link_file_append, unsafe_allow_html=True)
 
