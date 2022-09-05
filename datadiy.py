@@ -11,6 +11,10 @@ import missingno as msno
 
 st.set_page_config(layout="wide")
 
+uf = st.sidebar.file_uploader('Upload')
+if uf:
+    dff = pd.read_csv(uf)
+
 st.sidebar.write("1. Upload CSV file (currently CSV only)")
 st.sidebar.write("2. Dataframe shows your data real time")
 st.sidebar.write("3. Missingno show completeness of data")
@@ -77,7 +81,7 @@ def download_link(object_to_download, download_filename, download_link_text):
 
 st.title('DataDIY')
 
-tcol1, tcol2, tcol3 = st.beta_columns((1,1,1))
+tcol1, tcol2, tcol3 = st.columns((1,3,1))
 
 
 def datacleanser():
@@ -104,7 +108,7 @@ def datacleanser():
         ## [c] Remove NULL value
 
         # create UI container
-        mcol1, mcol2, mcol3 = st.beta_columns((1,1,1))
+        mcol1, mcol2, mcol3 = st.columns((1,1,1))
 
         # create empty list to get columns of raw dataframe
         col_list_raw = list()
@@ -112,7 +116,7 @@ def datacleanser():
             col_list_raw.append(col)
 
         # create expander for [a]
-        choose_col_expander = mcol1.beta_expander("Data fields to keep")
+        choose_col_expander = mcol1.expander("Data fields to keep")
 
         # create a NEW dataframe based on user selection
         selected_col = choose_col_expander.multiselect('Select data fields to keep. If none selection, all data fields will be retained',col_list_raw)
@@ -130,7 +134,7 @@ def datacleanser():
 
 #=================================================================================================================================================================
         # create expander for [b]
-        replace_null_expander = mcol1.beta_expander("Replace NULL values")
+        replace_null_expander = mcol1.expander("Replace NULL values")
 
         selected_col_replace = replace_null_expander.multiselect('Select Columns to replace NULL values [File 1]', col_list_modify)
 
@@ -153,7 +157,7 @@ def datacleanser():
 #=================================================================================================================================================================
 
         # create expander for [c]
-        remove_null_expander = mcol1.beta_expander("Remove NULL values")
+        remove_null_expander = mcol1.expander("Remove NULL values")
 
         selected_col_remove = remove_null_expander.multiselect('Select data fields to have rows removed if NULL. If no selection, all columns will be used', col_list_modify)
         if selected_col_remove:
@@ -171,7 +175,7 @@ def datacleanser():
         ## [f] Spare Placeholder
 
         # create expander for [f]
-        replace_value= mcol2.beta_expander("Replace Values")
+        replace_value= mcol2.expander("Replace Values")
 
         selected_col_replace_value = replace_value.multiselect('Select columns to replace', col_list_modify)
         
@@ -187,8 +191,8 @@ def datacleanser():
                 df_modify = df_modify.replace(old_value,new_value)
                 replace_value.write('Values replaced')
 
-        placeholder_1= mcol2.beta_expander("placeholder_1")
-        placeholder_2= mcol2.beta_expander("placeholder_2")
+        placeholder_1= mcol2.expander("placeholder_1")
+        placeholder_2= mcol2.expander("placeholder_2")
 
 #=================================================================================================================================================================
 
@@ -197,7 +201,7 @@ def datacleanser():
         ## [i] Spare Placeholder
 
         # create expander for [g]
-        distribution_expander = mcol3.beta_expander("Show distribution range (for numeric values only)")
+        distribution_expander = mcol3.expander("Show distribution range (for numeric values only)")
 
         selected_col_distribution = distribution_expander.selectbox('Select data field to display distribution', col_list_modify)
 
@@ -215,7 +219,7 @@ def datacleanser():
 #=================================================================================================================================================================
 
         # create expander for [h]
-        unique_value = mcol3.beta_expander("Show unique values")
+        unique_value = mcol3.expander("Show unique values")
 
         selected_col_unique = unique_value.selectbox('Select data field to show total unique value', col_list_modify)
         
@@ -229,7 +233,7 @@ def datacleanser():
 #=================================================================================================================================================================
         
         # create expander for [i]
-        download_file = mcol3.beta_expander("Download File")
+        download_file = mcol3.expander("Download File")
         if download_file.button('Export csv'):
             x = download_link(df_modify, 'output.csv', 'Click here to download file')
             download_file.markdown(x, unsafe_allow_html=True)
